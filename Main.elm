@@ -7,10 +7,8 @@ module Main (..) where
 import Html exposing (Html, Attribute, text, toElement, div, input)
 import Html.Attributes exposing (..)
 import Html.Events exposing (on, targetValue)
-import Signal exposing (Address)
-import StartApp.Simple as StartApp
-import String exposing (split)
-import Debug exposing (log)
+import StartApp.Simple
+import String
 import List
 import List.Extra
 
@@ -27,8 +25,8 @@ type Action
 queryParams : List ( String, String )
 queryParams =
   "a=1&b=2&c=3&d=4&e=5&f=6&g=7&a=8"
-    |> split "&"
-    |> List.map (split "=")
+    |> String.split "&"
+    |> List.map (String.split "=")
     |> List.map
         (\ls ->
           ( List.head ls |> Maybe.withDefault ""
@@ -50,7 +48,7 @@ updateIn ls indexToReplace newValue =
 
 
 main =
-  StartApp.start { model = queryParams, view = view, update = update }
+  StartApp.Simple.start { model = queryParams, view = view, update = update }
 
 
 update : Action -> Model -> Model
@@ -79,14 +77,14 @@ update action model =
         updateIn model index new
 
 
-view : Address Action -> Model -> Html
+view : Signal.Address Action -> Model -> Html
 view address model =
   div
     []
     [ div
         []
         (model
-          |> log "model"
+          |> Debug.log "model"
           |> List.indexedMap (,)
           |> List.map
               (\( index, tuple ) ->
