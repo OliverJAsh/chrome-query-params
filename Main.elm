@@ -63,7 +63,7 @@ update action model =
             |> Maybe.withDefault ( "", "" )
 
         new =
-          ( newKey, current |> snd )
+          ( newKey, snd current )
       in
         updateIn model index new
 
@@ -74,7 +74,7 @@ update action model =
             |> Maybe.withDefault ( "", "" )
 
         new =
-          ( current |> fst, newValue )
+          ( fst current, newValue )
       in
         updateIn model index new
 
