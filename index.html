@@ -1,0 +1,7 @@
+<div id="app"></div>
+<script src="elm.js"></script>
+<script>
+    var main = Elm.embed(Elm.Main, window.app);
+
+    main.ports.outputModel.subscribe(model => console.log(model));
+</script>

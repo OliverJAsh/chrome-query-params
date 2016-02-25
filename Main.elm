@@ -127,6 +127,11 @@ view address model =
     ]
 
 
+port outputModel : Signal Model
+port outputModel =
+  model
+
+
 main : Signal Html
 main =
   Signal.map (view actions.address) model
