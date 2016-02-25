@@ -14,7 +14,11 @@ import List.Extra
 
 
 type alias Model =
-  List ( String, String )
+  List Param
+
+
+type alias Param =
+  ( String, String )
 
 
 type Action
@@ -22,7 +26,7 @@ type Action
   | UpdateValue ( Int, String )
 
 
-queryParams : List ( String, String )
+queryParams : Model
 queryParams =
   "a=1&b=2&c=3&d=4&e=5&f=6&g=7&a=8"
     |> String.split "&"
@@ -51,30 +55,50 @@ main =
   StartApp.Simple.start { model = queryParams, view = view, update = update }
 
 
+withBlankDefault : Maybe Param -> Param
+withBlankDefault =
+  Maybe.withDefault ( "", "" )
+
+
+safeGetAtIndex : Model -> Int -> Param
+safeGetAtIndex model index =
+  List.Extra.getAt model index
+    |> withBlankDefault
+
+
 update : Action -> Model -> Model
 update action model =
   case action of
     UpdateKey ( index, newKey ) ->
       let
-        current =
-          List.Extra.getAt model index
-            |> Maybe.withDefault ( "", "" )
-
-        new =
-          ( newKey, snd current )
+        ( _, value ) =
+          safeGetAtIndex model index
       in
-        updateIn model index new
+        updateIn model index ( newKey, value )
 
     UpdateValue ( index, newValue ) ->
       let
-        current =
-          List.Extra.getAt model index
-            |> Maybe.withDefault ( "", "" )
-
-        new =
-          ( fst current, newValue )
+        ( key, _ ) =
+          safeGetAtIndex model index
       in
-        updateIn model index new
+        updateIn model index ( key, newValue )
+
+
+createInput : Signal.Address Action -> ( Int, Param ) -> Html
+createInput address ( index, ( param, paramValue ) ) =
+  div
+    []
+    [ input
+        [ value param
+        , on "input" targetValue (\str -> Signal.message address (UpdateKey ( index, str )))
+        ]
+        []
+    , input
+        [ value paramValue
+        , on "input" targetValue (\str -> Signal.message address (UpdateValue ( index, str )))
+        ]
+        []
+    ]
 
 
 view : Signal.Address Action -> Model -> Html
@@ -84,24 +108,8 @@ view address model =
     [ div
         []
         (model
-          |> Debug.log "model"
           |> List.indexedMap (,)
-          |> List.map
-              (\( index, tuple ) ->
-                div
-                  []
-                  [ input
-                      [ value (fst tuple)
-                      , on "input" targetValue (\str -> Signal.message address (UpdateKey ( index, str )))
-                      ]
-                      []
-                  , input
-                      [ value (snd tuple)
-                      , on "input" targetValue (\str -> Signal.message address (UpdateValue ( index, str )))
-                      ]
-                      []
-                  ]
-              )
+          |> List.map (createInput address)
         )
     , div
         []
