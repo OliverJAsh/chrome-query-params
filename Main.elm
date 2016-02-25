@@ -7,8 +7,8 @@ module Main (..) where
 import Html exposing (Html, Attribute, text, toElement, div, input)
 import Html.Attributes exposing (..)
 import Html.Events exposing (on, targetValue)
-import StartApp.Simple
 import String
+import Signal
 import List
 import List.Extra
 
@@ -24,10 +24,11 @@ type alias Param =
 type Action
   = UpdateKey ( Int, String )
   | UpdateValue ( Int, String )
+  | None
 
 
-queryParams : Model
-queryParams =
+initialModel : Model
+initialModel =
   "a=1&b=2&c=3&d=4&e=5&f=6&g=7&a=8"
     |> String.split "&"
     |> List.map (String.split "=")
@@ -51,8 +52,19 @@ updateIn ls indexToReplace newValue =
     |> List.map (\( index, tuple ) -> tuple)
 
 
+actions : Signal.Mailbox Action
+actions =
+  Signal.mailbox None
+
+
+model : Signal Model
+model =
+  Signal.foldp update initialModel actions.signal
+
+
+main : Signal Html
 main =
-  StartApp.Simple.start { model = queryParams, view = view, update = update }
+  Signal.map (view actions.address) model
 
 
 withBlankDefault : Maybe Param -> Param
@@ -82,6 +94,9 @@ update action model =
           safeGetAtIndex model index
       in
         updateIn model index ( key, newValue )
+
+    None ->
+      model
 
 
 createInput : Signal.Address Action -> ( Int, Param ) -> Html
