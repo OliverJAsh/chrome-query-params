@@ -62,20 +62,10 @@ model =
   Signal.foldp update initialModel actions.signal
 
 
-main : Signal Html
-main =
-  Signal.map (view actions.address) model
-
-
-withBlankDefault : Maybe Param -> Param
-withBlankDefault =
-  Maybe.withDefault ( "", "" )
-
-
 safeGetAtIndex : Model -> Int -> Param
 safeGetAtIndex model index =
   List.Extra.getAt model index
-    |> withBlankDefault
+    |> Maybe.withDefault ( "", "" )
 
 
 update : Action -> Model -> Model
@@ -135,3 +125,8 @@ view address model =
             )
         ]
     ]
+
+
+main : Signal Html
+main =
+  Signal.map (view actions.address) model
