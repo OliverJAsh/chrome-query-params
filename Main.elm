@@ -27,11 +27,10 @@ type Action
   | None
 
 
-port inputQueryParamsStr : Maybe String
+port inputQueryParamsStr : String
 initialModel : Model
 initialModel =
   inputQueryParamsStr
-    |> Maybe.withDefault ""
     |> String.split "&"
     |> List.map (String.split "=")
     |> List.map
