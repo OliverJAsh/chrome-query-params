@@ -4,5 +4,12 @@
         var main = Elm.fullscreen(Elm.Main, { inputQueryParamsStr: 'a=1&b=2&c=3&d=4&e=5&f=6&g=7&a=8' });
 
         main.ports.outputModel.subscribe(model => console.log(model));
+        main.ports.focus.subscribe(focusIndex => {
+            console.log(focusIndex)
+            setTimeout(() => {
+                const nodes = document.querySelectorAll('.key');
+                nodes[focusIndex].focus();
+            }, 50);
+        });
     </script>
 </body>

@@ -4,7 +4,7 @@
 
 module Main (..) where
 
-import Html exposing (Html, Attribute, text, toElement, div, input)
+import Html exposing (Html, Attribute, text, toElement, div, input, button)
 import Html.Attributes exposing (..)
 import Html.Events exposing (on, targetValue)
 import String
@@ -13,32 +13,38 @@ import List
 import List.Extra
 
 
-type alias Model =
-  List Param
-
-
 type alias Param =
   ( String, String )
+
+
+type alias Model =
+  { queryParams : List Param
+  , focusIndex : Maybe Int
+  }
 
 
 type Action
   = UpdateKey ( Int, String )
   | UpdateValue ( Int, String )
+  | Add
   | None
 
 
 port inputQueryParamsStr : String
 initialModel : Model
 initialModel =
-  inputQueryParamsStr
-    |> String.split "&"
-    |> List.map (String.split "=")
-    |> List.map
-        (\ls ->
-          ( List.head ls |> Maybe.withDefault ""
-          , List.Extra.getAt ls 1 |> Maybe.withDefault ""
-          )
-        )
+  { queryParams =
+      inputQueryParamsStr
+        |> String.split "&"
+        |> List.map (String.split "=")
+        |> List.map
+            (\ls ->
+              ( List.head ls |> Maybe.withDefault ""
+              , List.Extra.getAt ls 1 |> Maybe.withDefault ""
+              )
+            )
+  , focusIndex = Nothing
+  }
 
 
 updateIn : List a -> Int -> a -> List a
@@ -63,7 +69,7 @@ model =
   Signal.foldp update initialModel actions.signal
 
 
-safeGetAtIndex : Model -> Int -> Param
+safeGetAtIndex : List Param -> Int -> Param
 safeGetAtIndex model index =
   List.Extra.getAt model index
     |> Maybe.withDefault ( "", "" )
@@ -75,16 +81,26 @@ update action model =
     UpdateKey ( index, newKey ) ->
       let
         ( _, value ) =
-          safeGetAtIndex model index
+          safeGetAtIndex model.queryParams index
       in
-        updateIn model index ( newKey, value )
+        { model | queryParams = updateIn model.queryParams index ( newKey, value ) }
 
     UpdateValue ( index, newValue ) ->
       let
         ( key, _ ) =
-          safeGetAtIndex model index
+          safeGetAtIndex model.queryParams index
       in
-        updateIn model index ( key, newValue )
+        { model | queryParams = updateIn model.queryParams index ( key, newValue ) }
+
+    Add ->
+      let
+        newQueryParams =
+          List.append model.queryParams [ ( "", "" ) ]
+      in
+        { model
+          | queryParams = newQueryParams
+          , focusIndex = Just ((List.length newQueryParams) - 1)
+        }
 
     None ->
       model
@@ -95,7 +111,8 @@ createInput address ( index, ( param, paramValue ) ) =
   div
     []
     [ input
-        [ value param
+        [ Html.Attributes.class "key"
+        , value param
         , on "input" targetValue (\str -> Signal.message address (UpdateKey ( index, str )))
         ]
         []
@@ -111,16 +128,17 @@ view : Signal.Address Action -> Model -> Html
 view address model =
   div
     []
-    [ div
+    [ div [] [ button [ Html.Events.onClick address Add ] [ text "Add" ] ]
+    , div
         []
-        (model
+        (model.queryParams
           |> List.indexedMap (,)
           |> List.map (createInput address)
         )
     , div
         []
         [ text
-            (model
+            (model.queryParams
               |> List.map (\( key, value ) -> String.concat [ key, "=", value ])
               |> String.join "&"
             )
@@ -131,6 +149,13 @@ view address model =
 port outputModel : Signal Model
 port outputModel =
   model
+
+
+port focus : Signal (Maybe Int)
+port focus =
+  model
+    |> Signal.map (\{ focusIndex } -> focusIndex)
+    |> Signal.dropRepeats
 
 
 main : Signal Html
