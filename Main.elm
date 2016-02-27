@@ -248,4 +248,6 @@ columnStyles =
 inputStyles : Attribute
 inputStyles =
   Html.Attributes.style
-    [ ( "width", "100%" ) ]
+    [ ( "width", "100%" )
+    , ( "box-sizing", "border-box" )
+    ]
