@@ -14,3 +14,11 @@ Add the folder as a Chrome extension.
 
 For testing outside of the Chrome extension infrastructure, run `elm-reactor`
 and go to `popup.html`. You will need to update the input to use test data.
+
+## Release
+
+```
+./build.sh
+./bundle.sh
+# manually upload artifact
+```
