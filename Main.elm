@@ -5,8 +5,8 @@
 module Main (..) where
 
 import Html exposing (Html, Attribute, text, toElement, div, input, button)
-import Html.Attributes exposing (..)
 import Html.Events exposing (on, targetValue)
+import Html.Attributes
 import String
 import Signal
 import List
@@ -138,32 +138,28 @@ update action model =
 
 
 createRow : Signal.Address Action -> ( Int, Param ) -> Html
-createRow address ( index, ( param, paramValue ) ) =
-  let
-    key =
-      (String.concat [ (Basics.toString index), "-", param ])
-  in
-    Html.tr
-      [ Html.Attributes.key key ]
-      [ Html.td
-          []
-          [ input
-              [ Html.Attributes.class "key"
-              , value param
-              , on "input" targetValue (\str -> Signal.message address (UpdateKey ( index, str )))
-              ]
-              []
-          ]
-      , Html.td
-          []
-          [ input
-              [ Html.Attributes.class "value"
-              , value paramValue
-              , on "input" targetValue (\str -> Signal.message address (UpdateValue ( index, str )))
-              ]
-              []
-          ]
-      ]
+createRow address ( index, ( key, value ) ) =
+  Html.tr
+    [ Html.Attributes.key (String.concat [ (Basics.toString index), "-", key ]) ]
+    [ Html.td
+        []
+        [ input
+            [ Html.Attributes.class "key"
+            , Html.Attributes.value key
+            , on "input" targetValue (\str -> Signal.message address (UpdateKey ( index, str )))
+            ]
+            []
+        ]
+    , Html.td
+        []
+        [ input
+            [ Html.Attributes.class "value"
+            , Html.Attributes.value value
+            , on "input" targetValue (\str -> Signal.message address (UpdateValue ( index, str )))
+            ]
+            []
+        ]
+    ]
 
 
 view : Signal.Address Action -> Model -> Html
@@ -207,10 +203,6 @@ port focus : Signal (Maybe ( Int, String ))
 port focus =
   model
     |> Signal.map (\{ focus } -> focus)
-
-
-
---|> Signal.dropRepeats
 
 
 main : Signal Html
