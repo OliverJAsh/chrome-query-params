@@ -75,6 +75,11 @@ safeGetAtIndex model index =
     |> Maybe.withDefault ( "", "" )
 
 
+removeEmpty : List Param -> List Param
+removeEmpty params =
+  List.filter (\( key, value ) -> key /= "" || value /= "") params
+
+
 update : Action -> Model -> Model
 update action model =
   case action of
@@ -83,14 +88,20 @@ update action model =
         ( _, value ) =
           safeGetAtIndex model.queryParams index
       in
-        { model | queryParams = updateIn model.queryParams index ( newKey, value ) }
+        { model
+          | queryParams = updateIn model.queryParams index ( newKey, value ) |> removeEmpty
+          , focusIndex = Nothing
+        }
 
     UpdateValue ( index, newValue ) ->
       let
         ( key, _ ) =
           safeGetAtIndex model.queryParams index
       in
-        { model | queryParams = updateIn model.queryParams index ( key, newValue ) }
+        { model
+          | queryParams = updateIn model.queryParams index ( key, newValue ) |> removeEmpty
+          , focusIndex = Nothing
+        }
 
     Add ->
       let
