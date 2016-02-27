@@ -5,11 +5,13 @@
 
         main.ports.outputModel.subscribe(model => console.log(model));
         main.ports.focus.subscribe(focusIndex => {
-            console.log(focusIndex)
-            setTimeout(() => {
-                const nodes = document.querySelectorAll('.key');
-                nodes[focusIndex].focus();
-            }, 50);
+            console.log('focus', focusIndex)
+            if (focusIndex) {
+                setTimeout(() => {
+                    const nodes = document.querySelectorAll('.key');
+                    nodes[focusIndex].focus();
+                }, 50);
+            }
         });
     </script>
 </body>

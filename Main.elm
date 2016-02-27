@@ -117,21 +117,31 @@ update action model =
       model
 
 
-createInput : Signal.Address Action -> ( Int, Param ) -> Html
-createInput address ( index, ( param, paramValue ) ) =
-  div
+
+--[ Html.Attributes.key (String.concat [ (Basics.toString index), "-", key ]) ]
+
+
+createRow : Signal.Address Action -> ( Int, Param ) -> Html
+createRow address ( index, ( param, paramValue ) ) =
+  Html.tr
     []
-    [ input
-        [ Html.Attributes.class "key"
-        , value param
-        , on "input" targetValue (\str -> Signal.message address (UpdateKey ( index, str )))
-        ]
+    [ Html.td
         []
-    , input
-        [ value paramValue
-        , on "input" targetValue (\str -> Signal.message address (UpdateValue ( index, str )))
+        [ input
+            [ Html.Attributes.class "key"
+            , value param
+            , on "input" targetValue (\str -> Signal.message address (UpdateKey ( index, str )))
+            ]
+            []
         ]
+    , Html.td
         []
+        [ input
+            [ value paramValue
+            , on "input" targetValue (\str -> Signal.message address (UpdateValue ( index, str )))
+            ]
+            []
+        ]
     ]
 
 
@@ -140,12 +150,17 @@ view address model =
   div
     []
     [ div [] [ button [ Html.Events.onClick address Add ] [ text "Add" ] ]
-    , div
+    , Html.hr [] []
+    , Html.table
         []
-        (model.queryParams
-          |> List.indexedMap (,)
-          |> List.map (createInput address)
-        )
+        [ Html.thead [] [ Html.tr [] [ Html.th [] [ text "key" ], Html.th [] [ text "value" ] ] ]
+        , Html.tbody
+            []
+            (model.queryParams
+              |> List.indexedMap (,)
+              |> List.map (createRow address)
+            )
+        ]
     , div
         []
         [ text
