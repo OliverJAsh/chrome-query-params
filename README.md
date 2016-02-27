@@ -1,4 +1,4 @@
-# elm-url-chrome
+# query-params-chrome
 
 ## Testing
 

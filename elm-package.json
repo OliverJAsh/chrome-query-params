@@ -1,7 +1,7 @@
 {
     "version": "1.0.0",
     "summary": "",
-    "repository": "https://github.com/OliverJAsh/elm-url-chrome.git",
+    "repository": "https://github.com/OliverJAsh/query-params-chrome.git",
     "license": "BSD3",
     "source-directories": [
         "."
