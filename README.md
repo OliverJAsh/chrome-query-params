@@ -6,7 +6,7 @@ https://chrome.google.com/webstore/detail/query-params/jgacgeahnbmkhdhldifidddbk
 
 Written using [Elm](http://elm-lang.org/).
 
-![Demo](demo.png)
+![Demo](demo.gif)
 
 ## Testing
 
