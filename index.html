@@ -1,7 +1,12 @@
 <script src="elm.js"></script>
+<!-- <script src="/_reactor/debug.js"></script> -->
 <body>
     <script>
-        var main = Elm.fullscreen(Elm.Main, { inputQueryParamsStr: 'a=1&b=2&c=3&d=4&e=5&f=6&g=7&a=8' });
+        // Only works without ports
+        // var main = Elm.fullscreenDebug('Main', 'Main.elm');
+        // https://github.com/elm-lang/elm-reactor/issues/36
+        const main = Elm.fullscreen(Elm.Main, { inputQueryParamsStr: window.location.search
+            .replace(/^\?/, '') });
 
         main.ports.outputModel.subscribe(model => console.log(model));
         main.ports.focus.subscribe(focus => {
