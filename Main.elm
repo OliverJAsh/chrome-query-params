@@ -19,7 +19,7 @@ type alias Param =
 
 type alias Model =
   { queryParams : List Param
-  , focusIndex : Maybe Int
+  , focus : Maybe ( Int, String )
   }
 
 
@@ -43,7 +43,7 @@ initialModel =
               , List.Extra.getAt ls 1 |> Maybe.withDefault ""
               )
             )
-  , focusIndex = Nothing
+  , focus = Nothing
   }
 
 
@@ -87,20 +87,40 @@ update action model =
       let
         ( _, value ) =
           safeGetAtIndex model.queryParams index
+
+        newParam =
+          ( newKey, value )
+
+        newQueryParams =
+          updateIn model.queryParams index newParam |> removeEmpty
+
+        newIndex =
+          List.Extra.elemIndex newParam newQueryParams
       in
         { model
-          | queryParams = updateIn model.queryParams index ( newKey, value ) |> removeEmpty
-          , focusIndex = Nothing
+          | queryParams =
+              newQueryParams
+          , focus = newIndex |> Maybe.map (\index -> ( index, "key" ))
         }
 
     UpdateValue ( index, newValue ) ->
       let
         ( key, _ ) =
           safeGetAtIndex model.queryParams index
+
+        newParam =
+          ( key, newValue )
+
+        newQueryParams =
+          updateIn model.queryParams index newParam |> removeEmpty
+
+        newIndex =
+          List.Extra.elemIndex newParam newQueryParams
       in
         { model
-          | queryParams = updateIn model.queryParams index ( key, newValue ) |> removeEmpty
-          , focusIndex = Nothing
+          | queryParams =
+              newQueryParams
+          , focus = newIndex |> Maybe.map (\index -> ( index, "value" ))
         }
 
     Add ->
@@ -110,39 +130,40 @@ update action model =
       in
         { model
           | queryParams = newQueryParams
-          , focusIndex = Just ((List.length newQueryParams) - 1)
+          , focus = Just ( (List.length newQueryParams) - 1, "key" )
         }
 
     None ->
       model
 
 
-
---[ Html.Attributes.key (String.concat [ (Basics.toString index), "-", key ]) ]
-
-
 createRow : Signal.Address Action -> ( Int, Param ) -> Html
 createRow address ( index, ( param, paramValue ) ) =
-  Html.tr
-    []
-    [ Html.td
-        []
-        [ input
-            [ Html.Attributes.class "key"
-            , value param
-            , on "input" targetValue (\str -> Signal.message address (UpdateKey ( index, str )))
-            ]
-            []
-        ]
-    , Html.td
-        []
-        [ input
-            [ value paramValue
-            , on "input" targetValue (\str -> Signal.message address (UpdateValue ( index, str )))
-            ]
-            []
-        ]
-    ]
+  let
+    key =
+      (String.concat [ (Basics.toString index), "-", param ])
+  in
+    Html.tr
+      [ Html.Attributes.key key ]
+      [ Html.td
+          []
+          [ input
+              [ Html.Attributes.class "key"
+              , value param
+              , on "input" targetValue (\str -> Signal.message address (UpdateKey ( index, str )))
+              ]
+              []
+          ]
+      , Html.td
+          []
+          [ input
+              [ Html.Attributes.class "value"
+              , value paramValue
+              , on "input" targetValue (\str -> Signal.message address (UpdateValue ( index, str )))
+              ]
+              []
+          ]
+      ]
 
 
 view : Signal.Address Action -> Model -> Html
@@ -178,11 +199,18 @@ port outputModel =
   model
 
 
-port focus : Signal (Maybe Int)
+
+--https://github.com/evancz/elm-architecture-tutorial/issues/49
+
+
+port focus : Signal (Maybe ( Int, String ))
 port focus =
   model
-    |> Signal.map (\{ focusIndex } -> focusIndex)
-    |> Signal.dropRepeats
+    |> Signal.map (\{ focus } -> focus)
+
+
+
+--|> Signal.dropRepeats
 
 
 main : Signal Html
