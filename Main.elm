@@ -45,15 +45,20 @@ initialModel : Model
 initialModel =
   { queryParams =
       inputQueryParamsStr
-        |> String.split "&"
-        |> List.map (String.split "=")
-        |> List.map
+        |>
+          String.split "&"
+        |>
+          List.map (String.split "=")
+        |>
+          List.map
             (\ls ->
               ( List.head ls |> Maybe.withDefault ""
               , List.Extra.getAt ls 1 |> Maybe.withDefault ""
               )
             )
-        |> filterQualified
+        --Filter qualified
+        |>
+          List.filter isKeyNotEmpty
   , focus = Nothing
   }
 
@@ -96,14 +101,16 @@ isValueNotEmpty =
   \( _, value ) -> value /= ""
 
 
-filterQualified : Params -> Params
-filterQualified =
-  List.filter isKeyNotEmpty
+isParamNotEmpty param =
+  isKeyNotEmpty param || isValueNotEmpty param
 
 
-filterEmpty : Params -> Params
-filterEmpty params =
-  params |> List.filter (\x -> isKeyNotEmpty x || isValueNotEmpty x)
+removeIndex : List a -> Int -> List a
+removeIndex ls index =
+  ls
+    |> List.indexedMap (,)
+    |> List.Extra.removeWhen (\( i, _ ) -> i == index)
+    |> List.map (\( _, x ) -> x)
 
 
 update : Action -> Model -> Model
@@ -117,16 +124,25 @@ update action model =
         newParam =
           ( newKey, value )
 
-        newQueryParams =
-          updateIn model.queryParams index newParam |> filterEmpty
+        isNotEmpty =
+          isParamNotEmpty newParam
 
-        newIndex =
-          List.Extra.elemIndex newParam newQueryParams
+        newQueryParams =
+          if isNotEmpty then
+            updateIn model.queryParams index newParam
+          else
+            removeIndex model.queryParams index
+
+        newFocus =
+          if isNotEmpty then
+            Just ( index, "key" )
+          else
+            Nothing
       in
         { model
           | queryParams =
               newQueryParams
-          , focus = newIndex |> Maybe.map (\index -> ( index, "key" ))
+          , focus = newFocus
         }
 
     UpdateValue ( index, newValue ) ->
@@ -137,16 +153,25 @@ update action model =
         newParam =
           ( key, newValue )
 
-        newQueryParams =
-          updateIn model.queryParams index newParam |> filterEmpty
+        isNotEmpty =
+          isParamNotEmpty newParam
 
-        newIndex =
-          List.Extra.elemIndex newParam newQueryParams
+        newQueryParams =
+          if isNotEmpty then
+            updateIn model.queryParams index newParam
+          else
+            removeIndex model.queryParams index
+
+        newFocus =
+          if isNotEmpty then
+            Just ( index, "value" )
+          else
+            Nothing
       in
         { model
           | queryParams =
               newQueryParams
-          , focus = newIndex |> Maybe.map (\index -> ( index, "value" ))
+          , focus = newFocus
         }
 
     Add ->
