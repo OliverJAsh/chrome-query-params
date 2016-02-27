@@ -160,7 +160,7 @@ update action model =
 createRow : Signal.Address Action -> ( Int, Param ) -> Html
 createRow address ( index, ( key, value ) ) =
   Html.tr
-    [ Html.Attributes.key (String.concat [ (Basics.toString index), "-", key ]) ]
+    []
     [ Html.td
         []
         [ input
