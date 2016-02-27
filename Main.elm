@@ -11,6 +11,7 @@ import String
 import Signal
 import List
 import List.Extra
+import Signal.Time
 
 
 type alias Param =
@@ -178,21 +179,22 @@ view address model =
               |> List.map (createRow address)
             )
         ]
-    , div
-        []
-        [ text
-            (model.queryParams
-              |> List.filter (\( key, value ) -> key /= "")
-              |> List.map (\( key, value ) -> String.concat [ key, "=", value ])
-              |> String.join "&"
-            )
-        ]
     ]
 
 
-port outputModel : Signal Model
-port outputModel =
-  model
+port outputQueryParamsStr : Signal String
+port outputQueryParamsStr =
+  Signal.map
+    (\model ->
+      (model.queryParams
+        |> List.filter (\( key, value ) -> key /= "")
+        |> List.map (\( key, value ) -> String.concat [ key, "=", value ])
+        |> String.join "&"
+      )
+    )
+    model
+    |> Signal.dropRepeats
+    |> Signal.Time.settledAfter 300
 
 
 
