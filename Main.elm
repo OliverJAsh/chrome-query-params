@@ -162,11 +162,12 @@ createRow address ( index, ( key, value ) ) =
   Html.tr
     []
     [ Html.td
-        []
+        [ columnStyles ]
         [ input
             [ Html.Attributes.class "key"
             , Html.Attributes.value key
             , on "input" targetValue (\newKey -> Signal.message address (UpdateParam { index = index, isKey = True, param = ( newKey, value ) }))
+            , inputStyles
             ]
             []
         ]
@@ -176,6 +177,7 @@ createRow address ( index, ( key, value ) ) =
             [ Html.Attributes.class "value"
             , Html.Attributes.value value
             , on "input" targetValue (\newValue -> Signal.message address (UpdateParam { index = index, isKey = False, param = ( key, newValue ) }))
+            , inputStyles
             ]
             []
         ]
@@ -189,8 +191,8 @@ view address model =
     [ div [] [ button [ Html.Events.onClick address Add ] [ text "Add" ] ]
     , Html.hr [] []
     , Html.table
-        []
-        [ Html.thead [] [ Html.tr [] [ Html.th [] [ text "key" ], Html.th [] [ text "value" ] ] ]
+        [ tableStyles ]
+        [ Html.thead [] [ Html.tr [] [ Html.th [ columnStyles ] [ text "key" ], Html.th [] [ text "value" ] ] ]
         , Html.tbody
             []
             (model.queryParams
@@ -229,3 +231,21 @@ port focus =
 main : Signal Html
 main =
   Signal.map (view actions.address) model
+
+
+tableStyles : Attribute
+tableStyles =
+  Html.Attributes.style
+    [ ( "width", "250px" ) ]
+
+
+columnStyles : Attribute
+columnStyles =
+  Html.Attributes.style
+    [ ( "width", "50%" ) ]
+
+
+inputStyles : Attribute
+inputStyles =
+  Html.Attributes.style
+    [ ( "width", "100%" ) ]
