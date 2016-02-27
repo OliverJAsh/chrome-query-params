@@ -30,6 +30,8 @@ getTabUrl().then(url => {
                 const node = nodes[focus[0]];
                 node.querySelector(`.${focus[1]}`).focus();
             }, 50);
+        } else {
+            document.activeElement.blur();
         }
     });
 });
