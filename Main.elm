@@ -150,6 +150,7 @@ view address model =
         []
         [ text
             (model.queryParams
+              |> List.filter (\( key, value ) -> key /= "")
               |> List.map (\( key, value ) -> String.concat [ key, "=", value ])
               |> String.join "&"
             )
