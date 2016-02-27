@@ -34,8 +34,7 @@ type alias Model =
 
 
 type Action
-  = UpdateKey ( Int, String )
-  | UpdateValue ( Int, String )
+  = UpdateParam { index : Int, isKey : Bool, param : Param }
   | Add
   | None
 
@@ -90,12 +89,6 @@ emptyParam =
   ( "", "" )
 
 
-safeGetAtIndex : Params -> Int -> Param
-safeGetAtIndex model index =
-  List.Extra.getAt model index
-    |> Maybe.withDefault emptyParam
-
-
 isKeyNotEmpty : Param -> Bool
 isKeyNotEmpty =
   \( key, _ ) -> key /= ""
@@ -121,55 +114,26 @@ removeIndex ls index =
 update : Action -> Model -> Model
 update action model =
   case action of
-    UpdateKey ( index, newKey ) ->
+    UpdateParam { index, isKey, param } ->
       let
-        ( _, value ) =
-          safeGetAtIndex model.queryParams index
-
-        newParam =
-          ( newKey, value )
-
         isNotEmpty =
-          isParamNotEmpty newParam
+          isParamNotEmpty param
 
         newQueryParams =
           if isNotEmpty then
-            updateAtIndex model.queryParams index newParam
+            updateAtIndex model.queryParams index param
           else
             removeIndex model.queryParams index
 
         newFocus =
           if isNotEmpty then
-            Just ( index, "key" )
-          else
-            Nothing
-      in
-        { model
-          | queryParams =
-              newQueryParams
-          , focus = newFocus
-        }
-
-    UpdateValue ( index, newValue ) ->
-      let
-        ( key, _ ) =
-          safeGetAtIndex model.queryParams index
-
-        newParam =
-          ( key, newValue )
-
-        isNotEmpty =
-          isParamNotEmpty newParam
-
-        newQueryParams =
-          if isNotEmpty then
-            updateAtIndex model.queryParams index newParam
-          else
-            removeIndex model.queryParams index
-
-        newFocus =
-          if isNotEmpty then
-            Just ( index, "value" )
+            Just
+              ( index
+              , if isKey then
+                  "key"
+                else
+                  "value"
+              )
           else
             Nothing
       in
@@ -202,7 +166,7 @@ createRow address ( index, ( key, value ) ) =
         [ input
             [ Html.Attributes.class "key"
             , Html.Attributes.value key
-            , on "input" targetValue (\str -> Signal.message address (UpdateKey ( index, str )))
+            , on "input" targetValue (\newKey -> Signal.message address (UpdateParam { index = index, isKey = True, param = ( newKey, value ) }))
             ]
             []
         ]
@@ -211,7 +175,7 @@ createRow address ( index, ( key, value ) ) =
         [ input
             [ Html.Attributes.class "value"
             , Html.Attributes.value value
-            , on "input" targetValue (\str -> Signal.message address (UpdateValue ( index, str )))
+            , on "input" targetValue (\newValue -> Signal.message address (UpdateParam { index = index, isKey = False, param = ( key, newValue ) }))
             ]
             []
         ]
