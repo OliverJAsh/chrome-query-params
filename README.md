@@ -1,4 +1,8 @@
-# query-params-chrome
+# Query params Chrome extension
+
+Chrome extension for editing URL query parameters.
+
+https://chrome.google.com/webstore/detail/query-params/jgacgeahnbmkhdhldifidddbkneahmal
 
 Written using [Elm](http://elm-lang.org/).
 
