@@ -7,7 +7,7 @@ Written using [Elm](http://elm-lang.org/).
 ## Testing
 
 ```
-elm-make Main.elm --output elm.js
+./build.sh
 ```
 
 Add the folder as a Chrome extension.
