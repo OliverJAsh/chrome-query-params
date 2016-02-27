@@ -85,10 +85,15 @@ model =
   Signal.foldp update initialModel actions.signal
 
 
+emptyParam : Param
+emptyParam =
+  ( "", "" )
+
+
 safeGetAtIndex : Params -> Int -> Param
 safeGetAtIndex model index =
   List.Extra.getAt model index
-    |> Maybe.withDefault ( "", "" )
+    |> Maybe.withDefault emptyParam
 
 
 isKeyNotEmpty : Param -> Bool
@@ -177,7 +182,7 @@ update action model =
     Add ->
       let
         newQueryParams =
-          List.append model.queryParams [ ( "", "" ) ]
+          List.append model.queryParams [ emptyParam ]
       in
         { model
           | queryParams = newQueryParams
