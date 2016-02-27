@@ -189,15 +189,15 @@ view address model =
 
 port outputQueryParamsStr : Signal String
 port outputQueryParamsStr =
-  Signal.map
-    (\model ->
-      (model.queryParams
-        |> List.filter (\( key, value ) -> key /= "")
-        |> List.map (\( key, value ) -> String.concat [ key, "=", value ])
-        |> String.join "&"
-      )
-    )
-    model
+  model
+    |> Signal.map
+        (\{ queryParams } ->
+          (queryParams
+            |> List.filter (\( key, value ) -> key /= "")
+            |> List.map (\( key, value ) -> String.concat [ key, "=", value ])
+            |> String.join "&"
+          )
+        )
     |> Signal.dropRepeats
     |> Signal.Time.settledAfter 300
 
