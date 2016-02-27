@@ -72,7 +72,7 @@ updateIn ls indexToReplace newValue =
         ( indexToReplace
         , newValue
         )
-    |> List.map (\( index, tuple ) -> tuple)
+    |> List.map (\( _, tuple ) -> tuple)
 
 
 actions : Signal.Mailbox Action
