@@ -19,12 +19,16 @@ import List.Extra
 import Signal.Time
 
 
+type alias Params =
+  List Param
+
+
 type alias Param =
   ( String, String )
 
 
 type alias Model =
-  { queryParams : List Param
+  { queryParams : Params
   , focus : Maybe ( Int, String )
   }
 
@@ -49,6 +53,7 @@ initialModel =
               , List.Extra.getAt ls 1 |> Maybe.withDefault ""
               )
             )
+        |> filterQualified
   , focus = Nothing
   }
 
@@ -75,15 +80,30 @@ model =
   Signal.foldp update initialModel actions.signal
 
 
-safeGetAtIndex : List Param -> Int -> Param
+safeGetAtIndex : Params -> Int -> Param
 safeGetAtIndex model index =
   List.Extra.getAt model index
     |> Maybe.withDefault ( "", "" )
 
 
-removeEmpty : List Param -> List Param
-removeEmpty params =
-  List.filter (\( key, value ) -> key /= "" || value /= "") params
+isKeyNotEmpty : Param -> Bool
+isKeyNotEmpty =
+  \( key, _ ) -> key /= ""
+
+
+isValueNotEmpty : Param -> Bool
+isValueNotEmpty =
+  \( _, value ) -> value /= ""
+
+
+filterQualified : Params -> Params
+filterQualified =
+  List.filter isKeyNotEmpty
+
+
+filterEmpty : Params -> Params
+filterEmpty params =
+  params |> List.filter (\x -> isKeyNotEmpty x || isValueNotEmpty x)
 
 
 update : Action -> Model -> Model
@@ -98,7 +118,7 @@ update action model =
           ( newKey, value )
 
         newQueryParams =
-          updateIn model.queryParams index newParam |> removeEmpty
+          updateIn model.queryParams index newParam |> filterEmpty
 
         newIndex =
           List.Extra.elemIndex newParam newQueryParams
@@ -118,7 +138,7 @@ update action model =
           ( key, newValue )
 
         newQueryParams =
-          updateIn model.queryParams index newParam |> removeEmpty
+          updateIn model.queryParams index newParam |> filterEmpty
 
         newIndex =
           List.Extra.elemIndex newParam newQueryParams
