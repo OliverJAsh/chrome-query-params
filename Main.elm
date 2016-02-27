@@ -63,8 +63,8 @@ initialModel =
   }
 
 
-updateIn : List a -> Int -> a -> List a
-updateIn ls indexToReplace newValue =
+updateAtIndex : List a -> Int -> a -> List a
+updateAtIndex ls indexToReplace newValue =
   ls
     |> List.indexedMap (,)
     |> List.Extra.replaceIf
@@ -129,7 +129,7 @@ update action model =
 
         newQueryParams =
           if isNotEmpty then
-            updateIn model.queryParams index newParam
+            updateAtIndex model.queryParams index newParam
           else
             removeIndex model.queryParams index
 
@@ -158,7 +158,7 @@ update action model =
 
         newQueryParams =
           if isNotEmpty then
-            updateIn model.queryParams index newParam
+            updateAtIndex model.queryParams index newParam
           else
             removeIndex model.queryParams index
 
