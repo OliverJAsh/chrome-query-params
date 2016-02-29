@@ -222,7 +222,9 @@ port outputQueryParamsStr =
     |> Signal.map
         (\{ queryParams } ->
           (queryParams
-            |> List.filter (\( key, value ) -> key /= "")
+            --Filter qualified
+            |>
+              List.filter isKeyNotEmpty
             |>
               List.map encodeParam
             |>
