@@ -17,6 +17,7 @@ import Signal
 import List
 import List.Extra
 import Signal.Time
+import Http
 
 
 type alias Params =
@@ -39,6 +40,16 @@ type Action
   | None
 
 
+encodeParam : Param -> Param
+encodeParam ( key, value ) =
+  ( Http.uriEncode key, Http.uriEncode value )
+
+
+decodeParam : Param -> Param
+decodeParam ( key, value ) =
+  ( Http.uriDecode key, Http.uriDecode value )
+
+
 port inputQueryParamsStr : String
 initialModel : Model
 initialModel =
@@ -55,6 +66,8 @@ initialModel =
               , List.Extra.getAt ls 1 |> Maybe.withDefault ""
               )
             )
+        |>
+          List.map decodeParam
         --Filter qualified
         |>
           List.filter isKeyNotEmpty
@@ -210,8 +223,12 @@ port outputQueryParamsStr =
         (\{ queryParams } ->
           (queryParams
             |> List.filter (\( key, value ) -> key /= "")
-            |> List.map (\( key, value ) -> String.concat [ key, "=", value ])
-            |> String.join "&"
+            |>
+              List.map encodeParam
+            |>
+              List.map (\( key, value ) -> String.concat [ key, "=", value ])
+            |>
+              String.join "&"
           )
         )
     |> Signal.dropRepeats
