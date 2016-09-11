@@ -1,13 +1,4 @@
---https://github.com/evancz/elm-todomvc/tree/master
---http://package.elm-lang.org/packages/elm-lang/core/3.0.0
---https://github.com/deadfoxygrandpa/Elm.tmLanguage/issues/92
---Ports/effects/tasks
---https://gist.github.com/kami-/fd2427418628ada52ab1
---http://elm-lang.org/guide/interop
---http://elm-lang.org/guide/reactivity
-
-
-module Main (..) where
+module Main (..) exposing (..)
 
 import Html exposing (Html, Attribute, text, toElement, div, input, button)
 import Html.Events exposing (on, targetValue)
