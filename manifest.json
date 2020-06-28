@@ -14,7 +14,7 @@
     "commands": {
         "_execute_browser_action": {
             "suggested_key": {
-                "mac": "Command+Shift+K"
+                "mac": "Command+Shift+P"
             }
         }
     },
