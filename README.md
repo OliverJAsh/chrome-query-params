@@ -1,6 +1,6 @@
 # Query params Chrome extension
 
-Chrome extension for easily manipulating URL query parameters, written using [Elm](http://elm-lang.org/).
+Chrome extension which provides a user interface to read/write URL query parameters for the currently active tab.. Written using [Elm](http://elm-lang.org/).
 
 https://chrome.google.com/webstore/detail/query-params/jgacgeahnbmkhdhldifidddbkneahmal
 

@@ -1,6 +1,6 @@
 {
     "name": "Query params",
-    "description": "Easily manipulate URL query parameters.",
+    "description": "Provides a user interface to read/write URL query parameters for the currently active tab.",
     "version": "0.0.8",
     "browser_action": {
         "default_popup": "popup.html"
