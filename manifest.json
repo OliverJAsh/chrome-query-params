@@ -17,5 +17,8 @@
                 "mac": "Command+Shift+K"
             }
         }
+    },
+    "icons": {
+        "128": "icon.png"
     }
 }

@@ -6,7 +6,7 @@ read
 rm -rf upload upload.zip
 mkdir upload
 
-cp -f manifest.json popup.html boot.js elm.js upload
+cp -f manifest.json popup.html boot.js elm.js icon.png upload
 
 pushd upload
     zip -r upload.zip .
