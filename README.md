@@ -6,6 +6,12 @@ https://chrome.google.com/webstore/detail/query-params/jgacgeahnbmkhdhldifidddbk
 
 ![Demo](demo.gif)
 
+## Installation
+
+```bash
+yarn global add elm@0.16
+```
+
 ## Testing
 
 ```
