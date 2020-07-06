@@ -11,7 +11,8 @@
     "commands": {
         "_execute_browser_action": {
             "suggested_key": {
-                "mac": "Command+Shift+P"
+                "mac": "Command+Shift+P",
+                "windows": "Ctrl+Shift+P"
             }
         }
     },
